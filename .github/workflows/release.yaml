@@ -26,17 +26,17 @@ jobs:
     needs: create-release
     steps:
       - uses: actions/checkout@v3
-      - name: submodule update
+      - name: Submodule Update
         run: |
           git submodule update --init
           git submodule update
-      - name: auto reconfigure
+      - name: Auto Reconfigure
         run: autoreconf -fi
-      - name: configure
+      - name: Configure
         run: ./configure --with-oniguruma=builtin
-      - name: make
+      - name: Make
         run: make -j8 LDFLAGS=-all-static
-      - name: make check
+      - name: Make Check
         run: make check
       - name: Check Test Results
         if: always()
@@ -58,36 +58,30 @@ jobs:
     container:
       image: ubuntu:latest
     steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 12
       - uses: actions/checkout@v1
-      - name: install required packages
+      - name: Install Required Packages
         run: |
           apt update -y
           apt install autoconf libtool build-essential git bison -y
-      - name: submodule update
+      - name: Submodule Update
         run: |
           git submodule update --init
           git submodule update
-      - name: auto reconfigure
+      - name: Auto Reconfigure
         run: autoreconf -fi
-      - name: configure
+      - name: Configure
         run: ./configure --with-oniguruma=builtin
       - name: make
         run: make -j8 LDFLAGS=-all-static
-      - name: make check
+      - name: Make Check
         run: make check
       - name: Check Test Results
         if: always()
         run: cat test-suite.log
       - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.release_url }}
-          asset_path: ./jq
-          asset_name: jq-arm64
-          asset_content_type: application/octet-stream
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @jq \
+            "${{ needs.create-release.outputs.release_url }}/assets?name=jq-arm64"
