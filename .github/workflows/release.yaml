@@ -56,8 +56,14 @@ jobs:
 
   make-arm64:
     runs-on: [self-hosted, linux, ARM64]
+    container:
+      image: ubuntu:latest
     steps:
       - uses: actions/checkout@v3
+      - name: install required packages
+        run: |
+          apt update
+          apt install autoconf libtool build-essential git
       - name: submodule update
         run: |
           git submodule update --init
