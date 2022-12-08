@@ -62,7 +62,7 @@ jobs:
       - name: Install Required Packages
         run: |
           apt update -y
-          apt install autoconf libtool build-essential git bison -y
+          apt install autoconf libtool build-essential git bison curl -y
       - name: Submodule Update
         run: |
           git submodule update --init
