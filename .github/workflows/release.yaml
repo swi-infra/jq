@@ -84,4 +84,4 @@ jobs:
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @jq \
-            "${{ needs.create-release.outputs.release_url }}/assets?name=jq-arm64"
+            "${{ needs.create-release.outputs.release_url }}=jq-arm64"
