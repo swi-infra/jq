@@ -85,3 +85,38 @@ jobs:
             -H "Content-Type: application/octet-stream" \
             --data-binary @jq \
             "${{ needs.create-release.outputs.release_url }}=jq-arm64"
+
+  make-arm32:
+    runs-on: [self-hosted, linux, ARM32]
+    needs: create-release
+    container:
+      image: ubuntu:latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Required Packages
+        run: |
+          apt update -y
+          apt install autoconf libtool build-essential git bison curl -y
+      - name: Submodule Update
+        run: |
+          git submodule update --init
+          git submodule update
+      - name: Auto Reconfigure
+        run: autoreconf -fi
+      - name: Configure
+        run: ./configure --with-oniguruma=builtin
+      - name: make
+        run: make -j8 LDFLAGS=-all-static
+      - name: Make Check
+        run: make check
+      - name: Check Test Results
+        if: always()
+        run: cat test-suite.log
+      - name: Upload Release Asset
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @jq \
+            "${{ needs.create-release.outputs.release_url }}=jq-arm32"
+
